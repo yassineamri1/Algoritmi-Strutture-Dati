@@ -1,0 +1,56 @@
+<project  name = "UnionFindSet"  default = "all"   basedir = ".">
+    <description>
+
+    </description>
+
+    <property name = "project.name"   value = "${ant.project.name}"/>
+    <property name = "package.name"   value = "unionfindset"/>
+    <property name = "src.dir"        location = "src"/>
+    <property name = "dist.dir"       location = "dist"/>
+    <property name = "lib.dir"        location = "lib"/>
+    <property name = "classes.dir"    location = "classes"/>
+    <property name = "build.dir"      location = "build"/>
+    <property name = "junit"          location = "${lib.dir}/junit.jar"/>
+    <property name = "hamcrest-core"  location = "${lib.dir}/hamcrest-core.jar"/>
+
+    <target   name = "init">
+        <mkdir  dir = "${build.dir}"/>
+        <mkdir  dir = "${classes.dir}"/>
+    </target>
+
+    <target   name = "clean">
+        <delete dir = "${build.dir}"/>
+	<delete dir = "${classes.dir}"/>
+    </target>
+
+    <target   name = "compile"      depends = "init">
+        <javac  destdir = "${classes.dir}"  srcdir = "${src.dir}" includeantruntime="false" >
+            <classpath>
+                <pathelement  location = "${junit}"/>
+                <pathelement  location = "${hamcrest-core}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target     name = "jar"        depends = "compile">
+	<jar  destfile = "${build.dir}/${package.name}.jar"  basedir = "${classes.dir}"/>
+    </target>
+
+    <target name="junit" depends="compile" >
+        <mkdir dir="${build.dir}"/>
+        <jar destfile="${build.dir}/${project.name}Test.jar" basedir="${classes.dir}">
+	<zipgroupfileset dir="${lib.dir}" includes="*.jar" excludes=""/>
+          <manifest>
+	    <attribute name="Main-Class" value="${package.name}/${project.name}TestRunner"/>
+            <attribute name="Class-Path" value="${classpath}"/>
+          </manifest>
+        </jar>
+    </target>
+
+    <target  name = "test" depends="junit">
+        <java jar = "${build.dir}/${project.name}Test.jar" classpath = "${junit}; ${hamcrest-core}" fork = "true"/>
+    </target>
+
+    <target     name = "all"        depends = "init, compile, jar, junit, test">
+    </target>
+</project>
